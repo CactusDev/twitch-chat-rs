@@ -8,3 +8,4 @@ reqwest = "0.8.8"
 maplit = "1.0.1"
 ws = { version = "0.7.8", features = ["ssl"] }
 env_logger = "0.5.13"
+url = "1.7.0"

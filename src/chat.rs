@@ -4,6 +4,7 @@ use std::{
 };
 
 use ws;
+use url;
 
 struct Connector {
 	token: String,
@@ -51,7 +52,7 @@ pub struct TwitchChat {
 	token: String,
 	nick:  String,
 
-	handler: Option<Connector>
+	handler: Option<()>
 }
 
 impl TwitchChat {
@@ -67,17 +68,22 @@ impl TwitchChat {
 
 	pub fn connect(&mut self) -> Result<(), String> {
 		let endpoint = "wss://irc-ws.chat.twitch.tv";
-
-		println!("Connecting to: {}", endpoint);
-		ws::connect(endpoint, |out| {
-			Connector {
-				out,
-
-				token: self.token.clone(),
-				nick: self.nick.clone(),
-				channels: self.channels.clone()
-			}
-		}).unwrap();
-		Ok(())
+		match url::Url::parse(endpoint) {
+			Ok(url) => {
+				let mut socket = ws::WebSocket::new(|out| {
+					Connector {
+						out,
+						token: self.token.clone(),
+						nick: self.nick.clone(),
+						channels: self.channels.clone()
+					}
+				}).map_err(|err| { err.to_string() })?;
+				socket.connect(url).map_err(|err| { err.to_string() })?;
+				socket.run().map_err(|err| { err.to_string() })?;
+				// self.handler = Some(socket);  TODO: Figure out the type that will allow us to store this. Seems to be a pretty complex type...
+				Ok(())
+			},
+			Err(e) => Err(e.to_string())
+		}
 	}
 }
