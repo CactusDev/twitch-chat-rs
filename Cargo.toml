@@ -1,8 +1,9 @@
 [package]
-name = "twitch-chat-rs"
+name = "twitch-chat"
 version = "0.1.0"
 authors = ["Innectic <innectic@gmail.com>"]
 
 [dependencies]
 reqwest = "0.8.8"
 env_logger = "0.5.13"
+websocket = "0.22.0"
